@@ -99,8 +99,8 @@ namespace :deploy do
       # memcached
       case name
       when :host01
-        exec ip_address, "sudo cp infra/memcached/memcached.conf /etc/memcached.conf"
-        exec ip_address, "sudo systemctl restart memcached"
+        # exec ip_address, "sudo cp infra/memcached/memcached.conf /etc/memcached.conf"
+        # exec ip_address, "sudo systemctl restart memcached"
       else
         exec ip_address, "sudo systemctl stop memcached"
       end
@@ -108,8 +108,8 @@ namespace :deploy do
       # redis
       case name
       when :host01
-        exec ip_address, "sudo cp infra/redis/redis.conf /etc/redis/redis.conf"
-        exec ip_address, "sudo systemctl restart redis-server"
+        # exec ip_address, "sudo cp infra/redis/redis.conf /etc/redis/redis.conf"
+        # exec ip_address, "sudo systemctl restart redis-server"
       else
         exec ip_address, "sudo systemctl stop redis-server"
       end
@@ -149,31 +149,31 @@ multitask :deploy => HOSTS.keys.map { |name| "deploy:#{name}" }
 
 desc "POST /initialize"
 task :initialize do
-  sh "curl --max-time 20 -X POST --retry 3 --fail #{INITIALIZE_ENDPOINT}"
+  # sh "curl --max-time 20 -X POST --retry 3 --fail #{INITIALIZE_ENDPOINT}"
 end
 
 desc "Record current commit to issue"
 task :record do
-  revision = `git rev-parse --short HEAD`.strip
+  # revision = `git rev-parse --short HEAD`.strip
 
-  current_tag = [
-    Time.now.strftime("%Y%m%d-%H%M%S"),
-    `whoami`.strip
-  ].join("-")
+  # current_tag = [
+  #   Time.now.strftime("%Y%m%d-%H%M%S"),
+  #   `whoami`.strip
+  # ].join("-")
 
-  message = ":rocket: Deployed #{revision} [#{current_tag}](https://github.com/#{GITHUB_REPO}/releases/tag/#{current_tag})"
+  # message = ":rocket: Deployed #{revision} [#{current_tag}](https://github.com/#{GITHUB_REPO}/releases/tag/#{current_tag})"
 
-  # 直前のリリースのtagを取得する
-  before_tag = `git tag | tail -n 1`.strip
+  # # 直前のリリースのtagを取得する
+  # before_tag = `git tag | tail -n 1`.strip
 
-  unless before_tag.empty?
-    message << " ([compare](https://github.com/#{GITHUB_REPO}/compare/#{before_tag}...#{current_tag}))"
-  end
+  # unless before_tag.empty?
+  #   message << " ([compare](https://github.com/#{GITHUB_REPO}/compare/#{before_tag}...#{current_tag}))"
+  # end
 
-  sh "git tag -a #{current_tag} -m 'Release #{current_tag}'"
-  sh "git push --tags"
+  # sh "git tag -a #{current_tag} -m 'Release #{current_tag}'"
+  # sh "git push --tags"
 
-  sh "gh issue comment --repo #{GITHUB_REPO} #{GITHUB_ISSUE_ID} --body '#{message}'"
+  # sh "gh issue comment --repo #{GITHUB_REPO} #{GITHUB_ISSUE_ID} --body '#{message}'"
 end
 
 task :all => [:setup, :deploy, :initialize, :record]
